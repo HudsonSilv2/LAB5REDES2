@@ -1,0 +1,35 @@
+services:
+  monitor:
+    build: ./monitor
+    container_name: network-monitor
+    environment:
+      MONITOR_HOSTS: host1,host2
+      MONITOR_INTERVAL: 5
+      MONITOR_CYCLES: 10
+      PING_TIMEOUT: 1
+    volumes:
+      - ./results:/app/results
+    networks:
+      - monitoring_net
+    depends_on:
+      - host1
+      - host2
+
+  host1:
+    image: alpine:3.20
+    container_name: monitored-host-1
+    command: ["sh", "-c", "sleep infinity"]
+    networks:
+      - monitoring_net
+
+  host2:
+    image: alpine:3.20
+    container_name: monitored-host-2
+    command: ["sh", "-c", "sleep infinity"]
+    networks:
+      - monitoring_net
+
+networks:
+  monitoring_net:
+    name: monitoring_net
+    driver: bridge
